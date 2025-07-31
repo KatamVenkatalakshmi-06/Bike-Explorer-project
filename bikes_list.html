@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bikes in Category</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgba(30, 30, 30, 0.85);
+            color: #222;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 420px;
+            margin: 48px auto;
+            padding: 32px 24px 24px 24px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0, 95, 75, 0.15), 0 4px 8px rgba(192, 169, 142, 0.1);
+
+            border: 1.5px solid #2196f3;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 22px;
+            color: #2196f3;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+        label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2196f3;
+            margin-bottom: 8px;
+            display: block;
+        }
+        select {
+            padding: 10px;
+            font-size: 1rem;
+            margin-top: 8px;
+            width: 100%;
+            border-radius: 7px;
+            border: 1.5px solid #b3c6e0;
+            background: #f7fafd;
+            color: #222;
+            font-weight: 500;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        select:focus {
+            border: 2px solid #2196f3;
+        }
+        button {
+            display: block;
+            margin: 24px auto 0 auto;
+            padding: 10px 32px;
+            background: #2196f3;
+            color: #fff;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 12px #b3c6e0;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            outline: none;
+        }
+        button:hover {
+            background: #1769aa;
+            color: #fff;
+            transform: scale(1.04);
+            box-shadow: 0 4px 18px #2196f3;
+        }
+        .bike-card {
+            background: #f7fafd;
+            border: 1.5px solid #2196f3;
+            border-radius: 14px;
+            padding: 22px 18px;
+            margin: 18px 0;
+            box-shadow: 0 2px 16px #b3c6e0;
+        }
+        .bike-card h3 {
+            color: #2196f3;
+            margin-bottom: 10px;
+            letter-spacing: 1.2px;
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+        .bike-details p {
+            margin: 5px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #222;
+            letter-spacing: 0.5px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 22px;
+            text-align: center;
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #1769aa;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 8px;
+            }
+            button {
+                font-size: 0.95rem;
+                padding: 8px 14px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            .bike-card {
+                padding: 10px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚦 Explore Bikes in <span style="font-weight:900;">{{ category.replace('_', ' ').title() }}</span> 🚦</h1>
+        {% if bike_list is not defined %}
+            <form method="POST" action="/bikes">
+                <input type="hidden" name="category" value="{{ category }}">
+                <label for="bike_name">Select Your Favorite Model:</label>
+                <select name="bike_name" id="bike_name" required>
+                    <option value="">-- Select a bike --</option>
+                    {% if bikes.gear is defined %}
+                        <optgroup label="Gear Bikes">
+                        {% for bike in bikes.gear %}
+                            <option value="{{ bike.name }}">{{ bike.name }}</option>
+                        {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                    {% if bikes.non_gear is defined %}
+                        <optgroup label="Non-Gear Bikes">
+                        {% for bike in bikes.non_gear %}
+                            <option value="{{ bike.name }}">{{ bike.name }}</option>
+                        {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                    {% if bikes is iterable and bikes is not mapping %}
+                        {% for bike in bikes %}
+                            <option value="{{ bike.name }}">{{ bike.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <button type="submit">Show Me Details 🚀</button>
+            </form>
+        {% endif %}
+
+        {% if selected_bike %}
+            <div class="bike-card">
+                <h3>{{ selected_bike.name|upper }}</h3>
+                {% if selected_bike.image %}
+                    <img src="{{ selected_bike.image }}" alt="{{ selected_bike.name }}" style="max-width:320px;max-height:200px;display:block;margin:18px auto 18px auto;border-radius:12px;box-shadow:0 2px 16px #00e6e6;">
+                {% endif %}
+                <div class="bike-details">
+                    <p><span style="color:#7c4dff;font-weight:900;">Price:</span> {{ selected_bike.price }}</p>
+                    <p><span style="color:#7c4dff;font-weight:900;">Launch Year:</span> {{ selected_bike.launch }}</p>
+                    <p><span style="color:#7c4dff;font-weight:900;">Special:</span> {{ selected_bike.special }}</p>
+                    <p><span style="color:#7c4dff;font-weight:900;">Mileage:</span> {{ selected_bike.mileage }}</p>
+                    {% if selected_bike.colors %}
+                        <p><span style="color:#7c4dff;font-weight:900;">Available Colors:</span> {{ selected_bike.colors | join(', ') }}</p>
+                    {% endif %}
+                </div>
+                {% if emi_plan %}
+                <div class="bike-details" style="margin-top:10px;">
+                    <strong>EMI Plans:</strong>
+                    <ul>
+                        <li>12 months: ₹{{ emi_plan['12'] }} per month</li>
+                        <li>24 months: ₹{{ emi_plan['24'] }} per month</li>
+                        <li>36 months: ₹{{ emi_plan['36'] }} per month</li>
+                    </ul>
+                </div>
+                {% endif %}
+                {% if selected_bike.website %}
+                <div class="bike-details" style="margin-top:10px;">
+                    <a href="{{ selected_bike.website }}" target="_blank" style="color:#fff;background:#007bff;padding:8px 16px;border-radius:5px;text-decoration:none;">Buy on Official Website</a>
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <a href="/" class="back-link">&larr; Back to Category Selection</a>
+    </div>
+</body>
+</html>
